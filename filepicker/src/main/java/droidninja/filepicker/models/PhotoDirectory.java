@@ -1,17 +1,47 @@
 package droidninja.filepicker.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
-
+import droidninja.filepicker.FilePickerConst;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoDirectory {
+public class PhotoDirectory extends BaseFile implements Parcelable{
 
-  private String id;
+  private String bucketId;
   private String coverPath;
   private String name;
   private long   dateAdded;
-  private List<Photo> photos = new ArrayList<>();
+  private List<Media> medias = new ArrayList<>();
+
+  public PhotoDirectory()
+  {
+    super();
+  }
+
+  public PhotoDirectory(int id, String name, String path) {
+    super(id, name, path);
+  }
+
+  protected PhotoDirectory(Parcel in) {
+    bucketId = in.readString();
+    coverPath = in.readString();
+    name = in.readString();
+    dateAdded = in.readLong();
+  }
+
+  public static final Creator<PhotoDirectory> CREATOR = new Creator<PhotoDirectory>() {
+    @Override
+    public PhotoDirectory createFromParcel(Parcel in) {
+      return new PhotoDirectory(in);
+    }
+
+    @Override
+    public PhotoDirectory[] newArray(int size) {
+      return new PhotoDirectory[size];
+    }
+  };
 
   @Override
   public boolean equals(Object o) {
@@ -20,11 +50,11 @@ public class PhotoDirectory {
 
     PhotoDirectory directory = (PhotoDirectory) o;
 
-    boolean hasId = !TextUtils.isEmpty(id);
-    boolean otherHasId = !TextUtils.isEmpty(directory.id);
+    boolean hasId = !TextUtils.isEmpty(bucketId);
+    boolean otherHasId = !TextUtils.isEmpty(directory.bucketId);
 
     if (hasId && otherHasId) {
-      if (!TextUtils.equals(id, directory.id)) {
+      if (!TextUtils.equals(bucketId, directory.bucketId)) {
         return false;
       }
 
@@ -36,7 +66,7 @@ public class PhotoDirectory {
 
   @Override
   public int hashCode() {
-    if (TextUtils.isEmpty(id)) {
+    if (TextUtils.isEmpty(bucketId)) {
       if (TextUtils.isEmpty(name)) {
         return 0;
       }
@@ -44,7 +74,7 @@ public class PhotoDirectory {
       return name.hashCode();
     }
 
-    int result = id.hashCode();
+    int result = bucketId.hashCode();
 
     if (TextUtils.isEmpty(name)) {
       return result;
@@ -54,16 +84,13 @@ public class PhotoDirectory {
     return result;
   }
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public String getCoverPath() {
-    return coverPath;
+    if(medias!=null && medias.size()>0)
+      return medias.get(0).getPath();
+    else if(coverPath!=null)
+      return coverPath;
+    else
+    return "";
   }
 
   public void setCoverPath(String coverPath) {
@@ -86,24 +113,54 @@ public class PhotoDirectory {
     this.dateAdded = dateAdded;
   }
 
-  public List<Photo> getPhotos() {
-    return photos;
+  public List<Media> getMedias() {
+    return medias;
   }
 
-  public void setPhotos(List<Photo> photos) {
-    this.photos = photos;
+  public void setMedias(List<Media> medias) {
+    this.medias = medias;
   }
 
   public List<String> getPhotoPaths() {
-    List<String> paths = new ArrayList<>(photos.size());
-    for (Photo photo : photos) {
-      paths.add(photo.getPath());
+    List<String> paths = new ArrayList<>(medias.size());
+    for (Media media : medias) {
+      paths.add(media.getPath());
     }
     return paths;
   }
 
-  public void addPhoto(int id, String name, String path) {
-    photos.add(new Photo(id, name, path));
+  public void addPhoto(int id, String name, String path, int mediaType) {
+    medias.add(new Media(id, name, path, mediaType));
   }
 
+  public void addPhoto(Media media) {
+    medias.add(media);
+  }
+
+  public void addPhotos(List<Media> photosList) {
+    medias.addAll(photosList);
+  }
+
+  public String getBucketId() {
+    if(bucketId.equals(FilePickerConst.ALL_PHOTOS_BUCKET_ID))
+      return null;
+    return bucketId;
+  }
+
+  public void setBucketId(String bucketId) {
+    this.bucketId = bucketId;
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel parcel, int i) {
+    parcel.writeString(bucketId);
+    parcel.writeString(coverPath);
+    parcel.writeString(name);
+    parcel.writeLong(dateAdded);
+  }
 }

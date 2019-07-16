@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:padding="1dip"
         android:layout_gravity="center"
         android:id="@+id/iv_photo"
@@ -21,6 +21,14 @@
         android:visibility="gone"
         />
 
+    <ImageView
+        android:id="@+id/video_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_play_icon"
+        />
+
     <droidninja.filepicker.views.SmoothCheckBox
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
@@ -29,6 +37,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        style="@style/SmoothCheckBoxStyle"
         />
 
 </droidninja.filepicker.views.SquareRelativeLayout>
